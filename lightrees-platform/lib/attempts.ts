@@ -7,6 +7,7 @@ import {
   answers as answersTable,
 } from '../../src/db/schema';
 import { eq, inArray } from 'drizzle-orm';
+import { findTemplateForScore, createUserReport } from './reports';
 
 export async function getPublicAssessmentView(assessmentId: number) {
   const [assessment] = await db
@@ -94,7 +95,14 @@ export async function submitAssessmentAttempt(userId: number, assessmentId: numb
     answers.map((a) => ({ attemptId: attempt.id, questionId: a.questionId, choiceId: a.choiceId }))
   );
 
-  return { attemptId: attempt.id, totalScore: attempt.totalScore };
+  // Try to find a matching report template and create a user_report
+  const tpl = await findTemplateForScore(assessmentId, totalScore);
+  if (tpl) {
+    await createUserReport(attempt.id, tpl.id);
+    return { attemptId: attempt.id, totalScore: attempt.totalScore, report: { freeReport: tpl.freeReport, premiumLocked: true } };
+  }
+
+  return { attemptId: attempt.id, totalScore: attempt.totalScore, report: null };
 }
 
 export default {};
