@@ -1,7 +1,19 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '../../../lib/middleware';
-import { createAssessment } from '../../../lib/assessments';
+import { requireRole, requireAuth } from '../../../lib/middleware';
+import { createAssessment, listPublishedAssessments } from '../../../lib/assessments';
 import { createAssessmentSchema } from '../../../validators/assessment';
+
+export async function GET(request: Request) {
+  const auth = requireAuth(request as any);
+  if (auth instanceof NextResponse) return auth;
+
+  try {
+    const rows = await listPublishedAssessments();
+    return NextResponse.json({ assessments: rows }, { status: 200 });
+  } catch (err) {
+    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+  }
+}
 
 export async function POST(request: Request) {
   const auth = requireRole(request as any, 'MENTOR');

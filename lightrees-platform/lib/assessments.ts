@@ -125,3 +125,15 @@ export async function deleteAssessmentIfOwner(id: number, mentorId: number) {
   await db.delete(assessments).where(eq(assessments.id, id));
   return { id };
 }
+
+export async function listPublishedAssessments() {
+  const rows = await db
+    .select({
+      id: assessments.id,
+      title: assessments.title,
+      description: assessments.description,
+    })
+    .from(assessments)
+    .where(eq(assessments.status, 'PUBLISHED'));
+  return rows;
+}
