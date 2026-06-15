@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '../../../../../lib/middleware';
-import { updateQuestionIfOwner, deleteQuestionIfOwner } from '../../../../../lib/questions';
-import { updateQuestionSchema } from '../../../../../validators/question';
+import { requireRole } from '@/lib/middleware';
+import { updateQuestionIfOwner, deleteQuestionIfOwner } from '@/lib/questions';
+import { updateQuestionSchema } from '@/validators/question';
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const auth = requireRole(request as any, 'MENTOR');
