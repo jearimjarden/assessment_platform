@@ -1,5 +1,5 @@
 import { db } from './db';
-import { assessments, reportTemplates, userReports, assessmentAttempts } from '../../src/db/schema';
+import { assessments, reportTemplates, userReports, assessmentAttempts } from '@src/db/schema';
 import { eq, lte, gte } from 'drizzle-orm';
 
 export async function createReportTemplate(mentorId: number, assessmentId: number, input: { minScore: number; maxScore: number; freeReport: string; premiumReport: string }) {

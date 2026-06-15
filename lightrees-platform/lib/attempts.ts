@@ -5,7 +5,7 @@ import {
   choices,
   assessmentAttempts,
   answers as answersTable,
-} from '../../src/db/schema';
+} from '@src/db/schema';
 import { eq, inArray } from 'drizzle-orm';
 import { findTemplateForScore, createUserReport } from './reports';
 

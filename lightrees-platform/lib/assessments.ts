@@ -1,5 +1,5 @@
 import { db } from './db';
-import { assessments } from '../../src/db/schema';
+import { assessments } from '@src/db/schema';
 import { eq } from 'drizzle-orm';
 
 export async function createAssessment(mentorId: number, input: { title: string; description: string }) {

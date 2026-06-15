@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import { requireRole } from '../../../../../lib/middleware';
 import { submitAssessmentAttempt } from '../../../../../lib/attempts';
 
-export async function POST(request: Request, { params }: { params: { assessmentId: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ assessmentId: string }> }) {
   const auth = requireRole(request as any, 'USER');
   if (auth instanceof NextResponse) return auth;
 
-  const assessmentIdStr = params?.assessmentId ?? (() => {
+  const resolvedParams = await params;
+  const assessmentIdStr = resolvedParams?.assessmentId ?? (() => {
     const m = new URL(request.url).pathname.match(/\/api\/assessments\/([^\/]+)\/attempts/);
     return m ? m[1] : undefined;
   })();

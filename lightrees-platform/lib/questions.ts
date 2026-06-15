@@ -1,5 +1,5 @@
 import { db } from './db';
-import { assessments, choices, questions } from '../../src/db/schema';
+import { assessments, choices, questions } from '@src/db/schema';
 import { eq, inArray } from 'drizzle-orm';
 
 export async function createQuestion(mentorId: number, assessmentId: number, input: { text: string; orderNumber: number; choices: Array<{ text: string; score: number }> }) {
