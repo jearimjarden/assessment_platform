@@ -2,15 +2,12 @@ import { NextResponse } from 'next/server';
 import { requireRole } from '../../../../../lib/middleware';
 import { createReportTemplate, listReportTemplates } from '../../../../../lib/reports';
 
-export async function POST(request: Request, { params }: { params: { assessmentId: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ assessmentId: string }> }) {
   const auth = requireRole(request as any, 'MENTOR');
   if (auth instanceof NextResponse) return auth;
 
-  const assessmentIdStr = params?.assessmentId ?? (() => {
-    const m = new URL(request.url).pathname.match(/\/api\/assessments\/([^\/]+)\/reports/);
-    return m ? m[1] : undefined;
-  })();
-  const assessmentId = Number(assessmentIdStr);
+  const resolvedParams = await params;
+  const assessmentId = Number(resolvedParams.assessmentId);
   if (Number.isNaN(assessmentId)) return NextResponse.json({ error: 'Invalid assessment id' }, { status: 400 });
 
   const body = await request.json();
@@ -31,15 +28,12 @@ export async function POST(request: Request, { params }: { params: { assessmentI
   return NextResponse.json({ template: tpl }, { status: 201 });
 }
 
-export async function GET(request: Request, { params }: { params: { assessmentId: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ assessmentId: string }> }) {
   const auth = requireRole(request as any, 'MENTOR');
   if (auth instanceof NextResponse) return auth;
 
-  const assessmentIdStr = params?.assessmentId ?? (() => {
-    const m = new URL(request.url).pathname.match(/\/api\/assessments\/([^\/]+)\/reports/);
-    return m ? m[1] : undefined;
-  })();
-  const assessmentId = Number(assessmentIdStr);
+  const resolvedParams = await params;
+  const assessmentId = Number(resolvedParams.assessmentId);
   if (Number.isNaN(assessmentId)) return NextResponse.json({ error: 'Invalid assessment id' }, { status: 400 });
 
   const mentorId = (auth as any).sub as number;

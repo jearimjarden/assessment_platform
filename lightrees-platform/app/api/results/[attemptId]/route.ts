@@ -2,16 +2,12 @@ import { NextResponse } from 'next/server';
 import { requireRole } from '../../../../lib/middleware';
 import { getResultForAttempt } from '../../../../lib/reports';
 
-export async function GET(request: Request, { params }: { params: { attemptId: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ attemptId: string }> }) {
   const auth = requireRole(request as any, 'USER');
   if (auth instanceof NextResponse) return auth;
 
-  const attemptIdStr = params?.attemptId ?? (() => {
-    const m = new URL(request.url).pathname.match(/\/api\/results\/([^\/]+)/);
-    return m ? m[1] : undefined;
-  })();
-
-  const attemptId = Number(attemptIdStr);
+  const resolvedParams = await params;
+  const attemptId = Number(resolvedParams.attemptId);
   if (Number.isNaN(attemptId)) return NextResponse.json({ error: 'Invalid attempt id' }, { status: 400 });
 
   const userId = (auth as any).sub as number;

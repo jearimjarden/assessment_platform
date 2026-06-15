@@ -1,6 +1,6 @@
 import { db } from './db';
 import { assessments, reportTemplates, userReports, assessmentAttempts } from '@src/db/schema';
-import { eq, lte, gte } from 'drizzle-orm';
+import { and, eq, lte, gte } from 'drizzle-orm';
 
 export async function createReportTemplate(mentorId: number, assessmentId: number, input: { minScore: number; maxScore: number; freeReport: string; premiumReport: string }) {
   const [assessment] = await db
@@ -38,9 +38,7 @@ export async function findTemplateForScore(assessmentId: number, score: number) 
   const [tpl] = await db
     .select({ id: reportTemplates.id, freeReport: reportTemplates.freeReport, premiumReport: reportTemplates.premiumReport })
     .from(reportTemplates)
-    .where(eq(reportTemplates.assessmentId, assessmentId))
-    .where(lte(reportTemplates.minScore, score))
-    .where(gte(reportTemplates.maxScore, score));
+    .where(and(eq(reportTemplates.assessmentId, assessmentId), lte(reportTemplates.minScore, score), gte(reportTemplates.maxScore, score)));
 
   return tpl ?? null;
 }

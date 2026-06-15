@@ -73,5 +73,5 @@ export async function login(input: LoginInput) {
 }
 
 export function verifyToken(token: string) {
-  return jwt.verify(token, JWT_SECRET) as { sub: number; email: string; role: string; exp: number };
+  return jwt.verify(token, JWT_SECRET) as unknown as { sub: number; email: string; role: string; exp: number };
 }

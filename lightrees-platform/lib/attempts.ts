@@ -6,7 +6,7 @@ import {
   assessmentAttempts,
   answers as answersTable,
 } from '@src/db/schema';
-import { eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { findTemplateForScore, createUserReport } from './reports';
 
 export async function getPublicAssessmentView(assessmentId: number) {
@@ -59,8 +59,7 @@ export async function submitAssessmentAttempt(userId: number, assessmentId: numb
   const qs = await db
     .select({ id: questions.id })
     .from(questions)
-    .where(inArray(questions.id, questionIds))
-    .where(eq(questions.assessmentId, assessmentId));
+    .where(and(inArray(questions.id, questionIds), eq(questions.assessmentId, assessmentId)));
 
   if (qs.length !== new Set(questionIds).size) return { error: 'One or more questions not part of assessment' };
 

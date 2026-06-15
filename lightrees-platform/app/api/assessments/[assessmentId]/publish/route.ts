@@ -2,13 +2,12 @@ import { NextResponse } from 'next/server';
 import { requireRole } from '../../../../../lib/middleware';
 import { publishAssessmentIfOwner } from '../../../../../lib/assessments';
 
-export async function PATCH(request: Request, { params }: { params: { assessmentId: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ assessmentId: string }> }) {
   const auth = requireRole(request as any, 'MENTOR');
   if (auth instanceof NextResponse) return auth;
 
-  // Prefer Next.js App Router `params`, but fall back to parsing the URL
-  // pathname when `params` is not populated in some runtimes.
-  const assessmentIdStr = params?.assessmentId ?? (() => {
+  const resolvedParams = await params;
+  const assessmentIdStr = resolvedParams?.assessmentId ?? (() => {
     const m = new URL(request.url).pathname.match(/\/api\/assessments\/([^\/]+)\/publish/);
     return m ? m[1] : undefined;
   })();

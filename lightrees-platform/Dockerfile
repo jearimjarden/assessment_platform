@@ -1,13 +1,12 @@
 FROM node:22-alpine
 
-WORKDIR /app/lightrees-platform
+WORKDIR /app
 
-COPY lightrees-platform/package*.json ./
+COPY package*.json ./
 
 RUN npm install
 
-COPY lightrees-platform/ ./
-COPY src/ /app/src/
+COPY . .
 
 RUN npm run build
 

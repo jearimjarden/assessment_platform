@@ -4,11 +4,12 @@ import { updateAssessmentIfOwner, deleteAssessmentIfOwner } from '../../../../li
 import { updateAssessmentSchema } from '../../../../validators/assessment';
 import { getPublicAssessmentView } from '../../../../lib/attempts';
 
-export async function PATCH(request: Request, { params }: { params: { assessmentId: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ assessmentId: string }> }) {
   const auth = requireRole(request as any, 'MENTOR');
   if (auth instanceof NextResponse) return auth;
 
-  const id = Number(params.assessmentId);
+  const resolvedParams = await params;
+  const id = Number(resolvedParams.assessmentId);
   if (Number.isNaN(id)) {
     return NextResponse.json({ error: 'Invalid assessment id' }, { status: 400 });
   }
@@ -28,16 +29,12 @@ export async function PATCH(request: Request, { params }: { params: { assessment
   return NextResponse.json({ assessment: updated }, { status: 200 });
 }
 
-export async function GET(request: Request, { params }: { params: { assessmentId: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ assessmentId: string }> }) {
   const auth = requireRole(request as any, 'USER');
   if (auth instanceof NextResponse) return auth;
 
-  const assessmentIdStr = params?.assessmentId ?? (() => {
-    const m = new URL(request.url).pathname.match(/\/api\/assessments\/([^\/]+)/);
-    return m ? m[1] : undefined;
-  })();
-
-  const assessmentId = Number(assessmentIdStr);
+  const resolvedParams = await params;
+  const assessmentId = Number(resolvedParams.assessmentId);
   if (Number.isNaN(assessmentId)) return NextResponse.json({ error: 'Invalid assessment id' }, { status: 400 });
 
   const view = await getPublicAssessmentView(assessmentId);
@@ -46,11 +43,12 @@ export async function GET(request: Request, { params }: { params: { assessmentId
   return NextResponse.json(view, { status: 200 });
 }
 
-export async function DELETE(request: Request, { params }: { params: { assessmentId: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ assessmentId: string }> }) {
   const auth = requireRole(request as any, 'MENTOR');
   if (auth instanceof NextResponse) return auth;
 
-  const id = Number(params.assessmentId);
+  const resolvedParams = await params;
+  const id = Number(resolvedParams.assessmentId);
   if (Number.isNaN(id)) {
     return NextResponse.json({ error: 'Invalid assessment id' }, { status: 400 });
   }

@@ -3,11 +3,12 @@ import { requireRole } from '@/lib/middleware';
 import { updateQuestionIfOwner, deleteQuestionIfOwner } from '@/lib/questions';
 import { updateQuestionSchema } from '@/validators/question';
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = requireRole(request as any, 'MENTOR');
   if (auth instanceof NextResponse) return auth;
 
-  const id = Number(params.id);
+  const resolvedParams = await params;
+  const id = Number(resolvedParams.id);
   if (Number.isNaN(id)) {
     return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
   }
@@ -27,11 +28,12 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   return NextResponse.json({ question: updated }, { status: 200 });
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = requireRole(request as any, 'MENTOR');
   if (auth instanceof NextResponse) return auth;
 
-  const id = Number(params.id);
+  const resolvedParams = await params;
+  const id = Number(resolvedParams.id);
   if (Number.isNaN(id)) {
     return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
   }
