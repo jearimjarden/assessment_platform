@@ -1,19 +1,33 @@
 services:
+
+  app:
+    build: .
+    container_name: lightrees-app
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      DATABASE_URL: postgresql://lightrees:password@postgres:5432/lightrees
+      JWT_SECRET: production-secret-change-this
+
+    depends_on:
+      - postgres
+
+
   postgres:
     image: postgres:16
-    # Use a single, clear container name to avoid duplicate containers
+
     container_name: lightrees-postgres
 
     environment:
       POSTGRES_USER: lightrees
-      POSTGRES_PASSWORD: lightrees
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: lightrees
-
-    ports:
-      - "5432:5432"
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
 
 volumes:
   postgres_data:
