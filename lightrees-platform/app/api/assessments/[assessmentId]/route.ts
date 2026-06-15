@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireRole } from '../../../../lib/middleware';
 import { updateAssessmentIfOwner, deleteAssessmentIfOwner } from '../../../../lib/assessments';
 import { updateAssessmentSchema } from '../../../../validators/assessment';
+import { getPublicAssessmentView } from '../../../../lib/attempts';
 
 export async function PATCH(request: Request, { params }: { params: { assessmentId: string } }) {
   const auth = requireRole(request as any, 'MENTOR');
@@ -25,6 +26,24 @@ export async function PATCH(request: Request, { params }: { params: { assessment
   }
 
   return NextResponse.json({ assessment: updated }, { status: 200 });
+}
+
+export async function GET(request: Request, { params }: { params: { assessmentId: string } }) {
+  const auth = requireRole(request as any, 'USER');
+  if (auth instanceof NextResponse) return auth;
+
+  const assessmentIdStr = params?.assessmentId ?? (() => {
+    const m = new URL(request.url).pathname.match(/\/api\/assessments\/([^\/]+)/);
+    return m ? m[1] : undefined;
+  })();
+
+  const assessmentId = Number(assessmentIdStr);
+  if (Number.isNaN(assessmentId)) return NextResponse.json({ error: 'Invalid assessment id' }, { status: 400 });
+
+  const view = await getPublicAssessmentView(assessmentId);
+  if (!view) return NextResponse.json({ error: 'Assessment not found' }, { status: 404 });
+
+  return NextResponse.json(view, { status: 200 });
 }
 
 export async function DELETE(request: Request, { params }: { params: { assessmentId: string } }) {
