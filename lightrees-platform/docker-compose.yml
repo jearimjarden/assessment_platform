@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: lightrees-db
+
+    environment:
+      POSTGRES_USER: lightrees
+      POSTGRES_PASSWORD: lightrees
+      POSTGRES_DB: lightrees
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
