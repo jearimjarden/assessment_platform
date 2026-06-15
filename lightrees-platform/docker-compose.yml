@@ -1,7 +1,9 @@
 services:
 
   app:
-    build: .
+    build:
+      context: ..
+      dockerfile: lightrees-platform/Dockerfile
     container_name: lightrees-app
 
     ports:
